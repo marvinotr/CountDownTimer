@@ -9,10 +9,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView mTextView;
+    private TextView mCountDownTextView;
+    private ImageView mCodeImageView;
     private CountDownTimer mCountDownTimer;
 
     @Override
@@ -31,15 +33,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mTextView = (TextView) findViewById(R.id.count_down);
+        mCountDownTextView = (TextView) findViewById(R.id.count_down);
+        mCodeImageView = (ImageView) findViewById(R.id.verify_code);
+        mCodeImageView.setImageBitmap(CodeUtils.getInstance().createBitmap());
 
-        mCountDownTimer = new CountDownTimerUtils(mTextView, 60000, 1000);
-        mTextView.setOnClickListener(new View.OnClickListener() {
+        mCountDownTimer = new CountDownTimerUtils(mCountDownTextView, 60000, 1000);
+        mCountDownTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCountDownTimer.start();
             }
         });
+
+        mCodeImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCodeImageView.setImageBitmap(CodeUtils.getInstance().createBitmap());
+            }
+        });
+
     }
 
     @Override
