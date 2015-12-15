@@ -11,11 +11,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private TextView mCountDownTextView;
     private ImageView mCodeImageView;
     private CountDownTimer mCountDownTimer;
+    private SwitchButton mSwitchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mSwitchButton = (SwitchButton) findViewById(R.id.switcher);
+        mSwitchButton.setSwitchState(true);
+        mSwitchButton.setOnSwitchStateChangeListener(new OnSwitchStateChangeListener() {
+            @Override
+            public void onSwitchStateChange(boolean state) {
+                if (state) {
+                    Toast.makeText(MainActivity.this, "开关打开了", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "开关关闭了", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -75,4 +89,4 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-}
+ }
