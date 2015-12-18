@@ -69,6 +69,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        //初始化数据
+        mNumberList = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            mNumberList.add("1000000" + i);
+        }
+
         mNumberEditText = (EditText) findViewById(R.id.number);
         mSelectImageButton = (ImageButton) findViewById(R.id.select_number);
         mSelectImageButton.setOnClickListener(this);
@@ -108,11 +114,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化RecyclerView，模仿ListView下拉列表的效果
      */
     private void initRecyclerView(){
-        mNumberList = new ArrayList<>();
-        for (int i = 0; i < 30; i++) {
-            mNumberList.add("1000000" + i);
-        }
-
         mRecyclerView = new RecyclerView(this);
         //设置布局管理器
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
