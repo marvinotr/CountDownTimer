@@ -1,23 +1,36 @@
 package com.jackie.countdowntimer;
 
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView mCountDownTextView;
-    private ImageView mCodeImageView;
     private CountDownTimer mCountDownTimer;
+    private ImageView mCodeImageView;
     private SwitchButton mSwitchButton;
+    private EditText mNumberEditText;
+    private ImageButton mSelectImageButton;
+    private PopupWindow mPopupWindow;
+    private RecyclerView mRecyclerView;
+    private RecyclerViewAdapter mRecyclerViewAdapter;
+    private List<String> mNumberList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,23 +49,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mCountDownTextView = (TextView) findViewById(R.id.count_down);
+        mCountDownTimer = new CountDownTimerUtils(mCountDownTextView, 60000, 1000);
+        mCountDownTextView.setOnClickListener(this);
+
         mCodeImageView = (ImageView) findViewById(R.id.verify_code);
         mCodeImageView.setImageBitmap(CodeUtils.getInstance().createBitmap());
-
-        mCountDownTimer = new CountDownTimerUtils(mCountDownTextView, 60000, 1000);
-        mCountDownTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCountDownTimer.start();
-            }
-        });
-
-        mCodeImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCodeImageView.setImageBitmap(CodeUtils.getInstance().createBitmap());
-            }
-        });
+        mCodeImageView.setOnClickListener(this);
 
         mSwitchButton = (SwitchButton) findViewById(R.id.switcher);
         mSwitchButton.setSwitchState(true);
@@ -66,27 +68,70 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mNumberEditText = (EditText) findViewById(R.id.number);
+        mSelectImageButton = (ImageButton) findViewById(R.id.select_number);
+        mSelectImageButton.setOnClickListener(this);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.count_down:
+                mCountDownTimer.start();
+                break;
+            case R.id.verify_code:
+                mCodeImageView.setImageBitmap(CodeUtils.getInstance().createBitmap());
+                break;
+            case R.id.select_number:
+                showSelectNumberPopupWindow();
+                break;
+        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    /**
+     * 弹出选择号码的对话框
+     */
+    private void showSelectNumberPopupWindow() {
+        initRecyclerView();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        mPopupWindow = new PopupWindow(mRecyclerView, mNumberEditText.getWidth() - 4, 200);
+        mPopupWindow.setOutsideTouchable(true);		// 设置外部可以被点击
+        mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
+
+        mPopupWindow.setFocusable(true);		// 使PopupWindow可以获得焦点
+        // 显示在输入框的左下角
+        mPopupWindow.showAsDropDown(mNumberEditText, 2, -5);
+    }
+
+    /**
+     * 初始化RecyclerView，模仿ListView下拉列表的效果
+     */
+    private void initRecyclerView(){
+        mNumberList = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            mNumberList.add("1000000" + i);
         }
 
-        return super.onOptionsItemSelected(item);
+        mRecyclerView = new RecyclerView(this);
+        //设置布局管理器
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setBackgroundResource(R.drawable.background);
+
+        //设置Adapter
+        mRecyclerViewAdapter = new RecyclerViewAdapter(this, mNumberList);
+        mRecyclerView.setAdapter(mRecyclerViewAdapter);
+
+        //设置点击事件
+        mRecyclerViewAdapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                mNumberEditText.setText(mNumberList.get(position));
+                mNumberEditText.setSelection(mNumberEditText.getText().toString().length());
+            }
+        });
+
+        //添加分割线
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
     }
  }
