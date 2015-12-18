@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onItemClick(View view, int position) {
                 mNumberEditText.setText(mNumberList.get(position));
                 mNumberEditText.setSelection(mNumberEditText.getText().toString().length());
+                mPopupWindow.dismiss();
             }
         });
 
